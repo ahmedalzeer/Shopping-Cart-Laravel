@@ -10,10 +10,10 @@ class Product extends Model
         'name','slug','price','details','description'
     ];
 
-//    public function presentprice()
-//    {
-//        return money_format('$%i',$this->price /100);
-//    }
+    public function categories()
+    {
+        return $this->belongsToMany('App\Category');
+    }
     public function presentPrice($value)
     {
         return '$' . number_format($value);

@@ -98,7 +98,7 @@ class CartController extends Controller
 
             return response()->json(['success'=> false],400);
         }
-        
+
         Cart::update($id,$request->quantity);
 
         session()->flash('success','Quantity was updated successfully');

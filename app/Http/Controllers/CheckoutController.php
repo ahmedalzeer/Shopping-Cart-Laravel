@@ -54,7 +54,7 @@ class CheckoutController extends Controller
        try{
            $charge = Stripe::charges()->create([
                'amount'        => Cart::total(),
-               'currancy'      => '$',
+               'currancy'      => 'USD',
                'source'        => $request->stripeToken,
                'description'   =>'order',
                'receipt_email' => $request->email,
