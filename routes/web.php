@@ -27,3 +27,8 @@ Route::get('/thankyou','ConfirmationController@index')->name('confirmation.index
 Route::get('/empty',function (){
     Cart::instance('saveForLater')->destroy();
 });
+
+
+Route::group(['prefix' => 'admin'], function () {
+    Voyager::routes();
+});
