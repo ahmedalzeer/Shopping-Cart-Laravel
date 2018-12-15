@@ -42,6 +42,9 @@
         }
     },
     "scripts": {
+        "compile": [
+            "chmod -R 777 app/database/database.sqlite"
+        ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
