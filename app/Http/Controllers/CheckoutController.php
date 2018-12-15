@@ -10,6 +10,21 @@ use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
+    private function getNumbers()
+    {
+        $tax          = config('cart.tax') / 100 ;
+        $discount     = session()->get('coupon')['discount'] ?? 0 ;
+        $newSubtotal  = (Cart::subtotal() - $discount);
+        $newTotal     = $newSubtotal * (1 + $tax) ;
+        $newTax       = $newSubtotal * $tax ;
+        return collect([
+            'tax'         => $tax,
+            'discount'    => $discount,
+            'newSubtotal' => $newSubtotal,
+            'newTax'      => $newTax,
+            'newTotal'    => $newTotal
+        ]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +32,12 @@ class CheckoutController extends Controller
      */
     public function index()
     {
-        return view('checkout');
+        return view('checkout')->with([
+            'discount'    => $this->getNumbers()->get('discount'),
+            'newSubtotal' => $this->getNumbers()->get('newSubtotal'),
+            'newTax'      => $this->getNumbers()->get('newTax'),
+            'newTotal'    => $this->getNumbers()->get('newTotal')
+        ]);
     }
 
     /**
@@ -53,7 +73,7 @@ class CheckoutController extends Controller
         })->value()->toJson();
        try{
            $charge = Stripe::charges()->create([
-               'amount'        => Cart::total(),
+               'amount'        => $this->getNumbers()->get('newTotal'),
                'currancy'      => 'USD',
                'source'        => $request->stripeToken,
                'description'   =>'order',
@@ -61,10 +81,12 @@ class CheckoutController extends Controller
                'metadata'      => [
                    'contents'  => $contents,
                    'quantify'  => Cart::instance('default')->count(),
+                   'discount'  => collect(session()->get('coupon'))->toJson()
                ]
            ]);
 
            Cart::instance('default')->destroy();
+           session()->forget('coupon');
 
            return redirect()->route('confirmation.index')
                ->with('success','Your payment has been accepted successfully');
