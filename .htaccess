@@ -3,3 +3,15 @@ RewriteEngine on
 RewriteCond %{REQUEST_URI} !^public
 RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
+<VirtualHost *:80>
+     ServerName laravelht.vn
+     DocumentRoot ../database
+     SetEnv APPLICATION_ENV "development"
+     <Directory ../database>
+         DirectoryIndex index.php
+         AllowOverride All
+         Require all granted
+         Order allow,deny
+         Allow from all
+     </Directory>
+ </VirtualHost>
